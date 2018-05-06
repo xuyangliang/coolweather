@@ -1,10 +1,13 @@
 package com.liangge.coolweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.liangge.coolweather.db.City;
 import com.liangge.coolweather.db.County;
 import com.liangge.coolweather.db.Province;
+import com.liangge.coolweather.gson.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,11 +55,13 @@ public class Utilty {
         return false;
     }
     public static boolean handleCountyResponse(String response,int cityId){
-        if(TextUtils.isEmpty(response)){
+        Log.d("LIANGGE","456");
+        if(!TextUtils.isEmpty(response)){
             try{
-                JSONArray allcounties=new JSONArray(response);
-                for (int i=0;i<allcounties.length();i++){
-                    JSONObject countyObject=allcounties.getJSONObject(i);
+                Log.d("LIANGGE","456");
+                JSONArray allCounties=new JSONArray(response);
+                for (int i=0;i< allCounties.length();i++){
+                    JSONObject countyObject=allCounties.getJSONObject(i);
                     County county=new County();
                     county.setCountyName(countyObject.getString("name"));
                     county.setWeatherId(countyObject.getString("weather_id"));
@@ -70,5 +75,16 @@ public class Utilty {
             }
         }
         return false;
+    }
+    public static Weather handleWeatherResponse(String response){
+        try{
+            JSONObject jsonObject=new JSONObject(response);
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
+            String weatherContent=jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent,Weather.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 }

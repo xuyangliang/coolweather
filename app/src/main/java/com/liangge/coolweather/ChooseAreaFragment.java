@@ -1,9 +1,11 @@
 package com.liangge.coolweather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +77,12 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (currentLevel==LEVEL_CITY){
                     selectedCity=cityList.get(i);
                     queryCounties();
+                }else if (currentLevel==LEVEL_COUNTY){
+                    String weatherId=countyList.get(i).getWeatherId();
+                    Intent intent=new Intent(getActivity(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -107,6 +115,7 @@ public class ChooseAreaFragment extends Fragment {
             int provinceCode=selectedProvince.getProvinceCode();
             int cityCode=selectedCity.getCityCode();
             String address="http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
+            Log.d("CITYCODE",""+cityCode);
             queryFromServer(address,"county");
         }
     }
@@ -134,6 +143,7 @@ public class ChooseAreaFragment extends Fragment {
                }else if ("city".equals(type)){
                    result=Utilty.handleCityResponse(responseText,selectedProvince.getId());
                }else if ("county".equals(type)){
+                   Log.d("LIANGGE","123");
                    result=Utilty.handleCountyResponse(responseText,selectedCity.getId());
                }
                if (result){
@@ -184,14 +194,14 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel=LEVEL_CITY;
         }else {
             int provinceCode=selectedProvince.getProvinceCode();
-            String address="http://goulin.tech/api/china/"+provinceCode;
+            String address="http://guolin.tech/api/china/"+provinceCode;
             queryFromServer(address,"city");
         }
 
     }
 
     private void queryProvinces() {
-        titleText.setText("中国");
+        titleText.setText("China");
         backButton.setVisibility(View.GONE);
         provinceList= DataSupport.findAll(Province.class);
         if (provinceList.size()>0){
@@ -203,7 +213,7 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel=LEVEL_PROVINCE;
         }else {
-            String address="http://goulin.tech/api/china";
+            String address="http://guolin.tech/api/china";
             queryFromServer(address,"province");
         }
     }
